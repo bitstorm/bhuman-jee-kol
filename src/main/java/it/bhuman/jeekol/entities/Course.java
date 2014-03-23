@@ -19,7 +19,18 @@
 
 package it.bhuman.jeekol.entities;
 
+import java.io.Serializable;
 import java.util.Set;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -29,13 +40,22 @@ import java.util.Set;
  * http://docs.oracle.com/javaee/6/tutorial/doc/bnbqa.html
  * 
  */
-public class Course
+@Entity
+public class Course implements Serializable
 {
+	@Id
     final private long id;
     
     private String name;
     private int    year;
     
+    @JoinTable(
+    		   name = "attendees",
+    		   joinColumns = @JoinColumn( name="course_id"),
+    		   inverseJoinColumns = @JoinColumn( name="student_id")
+    )
+    @ManyToMany(fetch =FetchType.LAZY)
+    @JsonIgnore
     Set<Student> attendees;
 
     public Course(long id, String name, int year)

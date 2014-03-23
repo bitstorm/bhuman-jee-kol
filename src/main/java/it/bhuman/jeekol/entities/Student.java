@@ -19,11 +19,17 @@
 
 package it.bhuman.jeekol.entities;
 
+import java.io.Serializable;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 /**
  *
  * @author uji
  */
-public class Student
+@Entity
+public class Student implements Serializable
 {
     /**
      * @return the gender
@@ -42,6 +48,7 @@ public class Student
     }
     public static enum Gender { MALE, FEMALE };
     
+    @Id
     final private long id;
     
     private String name;
