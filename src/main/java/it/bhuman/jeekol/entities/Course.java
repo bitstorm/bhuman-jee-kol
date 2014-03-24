@@ -44,10 +44,12 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 public class Course implements Serializable
 {
 	@Id
-    final private long id;
+    private long id;
     
     private String name;
-    private int    year;
+    private int year;
+    
+    private String femmaleratio;
     
     @JoinTable(
     		   name = "attendees",
@@ -58,6 +60,11 @@ public class Course implements Serializable
     @JsonIgnore
     Set<Student> attendees;
 
+    public Course()
+    {
+    	
+    }
+    
     public Course(long id, String name, int year)
     {
         this.id = id;
@@ -124,4 +131,12 @@ public class Course implements Serializable
     {
         this.year = year;
     }
+
+	public String getFemmaleratio() {
+		return femmaleratio;
+	}
+
+	public void setFemmaleratio(String femmaleratio) {
+		this.femmaleratio = femmaleratio;
+	}
 }

@@ -49,10 +49,16 @@ public class Student implements Serializable
     public static enum Gender { MALE, FEMALE };
     
     @Id
-    final private long id;
+    private long id;
     
     private String name;
     private Gender gender;
+    
+    
+    public Student()
+    {
+    	
+    }
     
     public Student(long id, String name, Gender gender)
     {

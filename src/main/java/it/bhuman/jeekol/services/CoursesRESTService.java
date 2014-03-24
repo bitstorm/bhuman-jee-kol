@@ -39,7 +39,7 @@ import javax.ws.rs.core.Response;
 public class CoursesRESTService
 {
     @EJB
-    private DummyDataStore dataStore;
+    private JpaDataStore dataStore;
 
     @GET
     @Path("/courses")

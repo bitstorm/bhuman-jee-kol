@@ -1,5 +1,8 @@
 package it.bhuman.jeekol.services;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -11,6 +14,7 @@ import it.bhuman.jeekol.entities.Student;
 import it.bhuman.jeekol.entities.Student.Gender;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.persistence.EntityManager;
@@ -18,6 +22,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import javax.sql.DataSource;
 
 @Startup
 @Singleton
@@ -25,6 +31,9 @@ public class JpaDataStore {
 	
 	@PersistenceUnit(unitName = "test")
     private EntityManagerFactory entityManagerFactory;
+	@Resource(lookup = "java:global/jdbc/MyDS")
+	private DataSource dataSource;
+	
 	private EntityManager entityManager;
 	private CriteriaQuery<Course> allCoursesCriteria;
 	
@@ -32,12 +41,33 @@ public class JpaDataStore {
     void init()
     {
 		entityManager = entityManagerFactory.createEntityManager();
-		CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
-		allCoursesCriteria = builder.createQuery(Course.class);
 		
 		persistTestEntities();
-        
+		executeFemMaleQuery();
+		createQueryCriteria();
     }
+
+	private void executeFemMaleQuery() {
+		try {
+			Connection connection = dataSource.getConnection();
+		
+			Statement statement = connection.createStatement();
+			
+			statement.execute("update course c1 set femmaleratio = ( \n" +
+          "select ( select count(*) from student s1 where s1.gender = 0 and s1.id in (select student_id from attendees where course_id = c1.id)) \n" + 
+          "  || '/'  \n" +
+          " || ( select count(*) from student s1 where s1.gender = 1 and s1.id in (select student_id from attendees where course_id = c1.id)))");
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void createQueryCriteria() {
+		CriteriaBuilder builder = entityManagerFactory.getCriteriaBuilder();
+		allCoursesCriteria = builder.createQuery(Course.class);
+		Root<Course> root = allCoursesCriteria.from(Course.class);
+		allCoursesCriteria.select(root);
+	}
 
 	private void persistTestEntities() {
 		Student s0 = new Student(0, "Andrea", Gender.MALE);
@@ -110,6 +140,9 @@ public class JpaDataStore {
         entityManager.persist(c2);
         entityManager.persist(c3);
         entityManager.persist(c4);
+        
+        entityManager.flush();
+		entityManager.clear();
 	}
 
 	private void persistCollection(Collection<?>... collections) {
