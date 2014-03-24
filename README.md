@@ -3,6 +3,12 @@ bhuman-jee-kol
 
 Progetto utilizzato per le esercitazioni JEE
 
+note sull'utilizzo della soluzione
+-----------
+
+l'applicazione richiede un'istanza di Postgresql. Di default l'applicazione cerca di usare il databse chiamato 'test' collegandosi ad un'istanza locale di Postgresql ed usando username e password 'postgres'. Questi parametri di connessione possono essere modificati nella classe di configurazione `DsConfig`. 
+Per avviare l'applicazione è sufficiente usare Maven con il comando `mvn jboss-as:run`.
+
 descrizione
 -----------
 
